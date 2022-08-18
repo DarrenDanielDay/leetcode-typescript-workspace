@@ -1,0 +1,38 @@
+/**
+ * Copyright (C) 2022  DarrenDanielDay <Darren_Daniel_Day@hotmail.com>
+ *
+ * This source code is licensed under the GPL-3.0 license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+{
+  "compilerOptions": {
+    "rootDir": ".",
+    "module": "ESNext",
+    "outDir": "dist",
+    "target": "ES2020", // leetcode compiler option
+    "declaration": false,
+    "strict": true,
+    "strictNullChecks": true,
+    "strictBindCallApply": true, // leetcode compiler option
+    "strictFunctionTypes": true, // leetcode compiler option
+    "strictPropertyInitialization": true,
+    "alwaysStrict": true, // leetcode compiler option
+    "allowJs": true,
+    "checkJs": true,
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noStrictGenericChecks": false,
+    "noUncheckedIndexedAccess": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "moduleResolution": "Node",
+    "sourceMap": true
+  }
+}
