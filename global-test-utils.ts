@@ -17,7 +17,7 @@ const testObject = (() => {
      * @param nums linked list node values
      * @returns linked list head node, null if given empty values
      */
-    const create = (nums: number[]): ListNode | null => {
+    const create = (nums: readonly number[]): ListNode | null => {
       const headValue = nums[0];
       if (headValue == null) {
         return null;
@@ -36,7 +36,7 @@ const testObject = (() => {
      * @returns a compare function which accepts a head node and returns boolean
      */
     const compare =
-      (nums: number[]) =>
+      (nums: readonly number[]) =>
       (head: ListNode | null): boolean => {
         for (let i = 0, current = head; i < nums.length; i++, current = current.next) {
           if (!current) {
@@ -75,7 +75,7 @@ const testObject = (() => {
      * @param nums node values in BFS order, null for empty child
      * @returns the root of a new tree, null if first value is nullish
      */
-    const create = (nums: (number | null)[]): TreeNode | null => {
+    const create = (nums: readonly (number | null)[]): TreeNode | null => {
       const rootValue = nums[0];
       if (rootValue == null) {
         return null;
@@ -108,7 +108,7 @@ const testObject = (() => {
      * @returns a compare function which accepts a root node and returns boolean
      */
     const compare =
-      (nums: (number | null)[]) =>
+      (nums: readonly (number | null)[]) =>
       (root: TreeNode | null): boolean => {
         const rootValue = nums[0];
         if (root === null) {
@@ -217,7 +217,7 @@ const testObject = (() => {
      * @param arr nested number array
      * @returns leetcode NestedInteger array
      */
-    const create = (arr: NestedNode[]): NestedInteger[] => arr.map(build);
+    const create = (arr: readonly NestedNode[]): NestedInteger[] => arr.map(build);
     /**
      * Compare your nested integer with a nested number array node.
      * @param node a nested number array node
@@ -257,8 +257,8 @@ const testObject = (() => {
      * @returns a compare function which accepts an array of NestedInteger and returns boolean
      */
     const compareList =
-      (arr: NestedNode[]) =>
-      (roots: NestedInteger[]): boolean =>
+      (arr: readonly NestedNode[]) =>
+      (roots: readonly NestedInteger[]): boolean =>
         arr.length === roots.length && arr.every((node, i) => compareOne(node)(roots[i]!));
 
     return {
@@ -318,7 +318,7 @@ const testObject = (() => {
      * Run test cases with solution function.
      * @param cases test cases, expected value can be a compare function.
      */
-    withCases: (...cases: [Parameters<Func>, ExpectedOrTester<ReturnType<Func>>][]) => {
+    withCases: (...cases:  readonly (readonly [Readonly<Parameters<Func>>, ExpectedOrTester<ReturnType<Func>>])[]) => {
       for (const [i, [input, expectedOrTester]] of cases.entries()) {
         try {
           runTestAndCompare(input, expectedOrTester, () => Reflect.apply(solution, void 0, input), "case", i);
@@ -335,20 +335,20 @@ const testObject = (() => {
     type MethodKey = {
       [K in string & keyof Instance]: Instance[K] extends AnyFunc ? K : never;
     }[string & keyof Instance];
-    type Inputs<Methods extends MethodKey[]> = {
+    type Inputs<Methods extends readonly MethodKey[]> = {
       // @ts-expect-error Do not work with TypeScript 4.5.4
-      [I in keyof Methods]: Parameters<Instance[Methods[I]]>;
+      [I in keyof Methods]: Readonly<Parameters<Instance[Methods[I]]>>;
     };
-    type Results<Methods extends MethodKey[]> = {
+    type Results<Methods extends readonly MethodKey[]> = {
       [I in keyof Methods]: ExpectedOrTester<
         // @ts-expect-error Do not work with TypeScript 4.5.4
         ReturnType<Instance[Methods[I]]> extends void ? null | undefined | void : ReturnType<Instance[Methods[I]]>
       >;
     };
     let instanceId = 0;
-    const invoke = <Methods extends MethodKey[]>([, ...methods]: [string, ...Methods]) => {
-      const withInputs = ([params, ...inputs]: [ConstructorParameters<Constructor>, ...Inputs<Methods>]) => {
-        const expectResults = ([, ...results]: [unknown, ...Results<Methods>]) => {
+    const invoke = <Methods extends readonly MethodKey[]>([, ...methods]: readonly [string, ...Methods]) => {
+      const withInputs = ([params, ...inputs]: readonly [ConstructorParameters<Constructor>, ...Inputs<Methods>]) => {
+        const expectResults = ([, ...results]: readonly [unknown, ...Results<Methods>]) => {
           if (methods.length !== inputs.length || methods.length !== results.length) {
             throw new Error("Invalid usage. Lengths of `invoke`, `withInputs`, `expectResults` must be the same.");
           }
