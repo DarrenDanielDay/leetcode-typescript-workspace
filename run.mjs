@@ -15,7 +15,7 @@ Copyright (C) 2022  DarrenDanielDay <Darren_Daniel_Day@hotmail.com>
 
 This source code is licensed under the GPL-3.0 license found in the
 LICENSE file in the root directory of this source tree.
-`)
+`);
 }
 const [, , rawFile] = process.argv;
 if (!rawFile) {
@@ -84,7 +84,7 @@ for (const injectionFile of internalFiles) {
 }
 //#endregion
 
-const mainTag = `${file} total time cost`
+const mainTag = `${file} total time cost`;
 console.time(mainTag);
 try {
   const importPath = toModuleURL(outfile);
