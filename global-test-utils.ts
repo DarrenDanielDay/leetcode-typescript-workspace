@@ -318,7 +318,7 @@ const testObject = (() => {
      * Run test cases with solution function.
      * @param cases test cases, expected value can be a compare function.
      */
-    withCases: (...cases:  readonly (readonly [Readonly<Parameters<Func>>, ExpectedOrTester<ReturnType<Func>>])[]) => {
+    withCases: (...cases: readonly (readonly [Readonly<Parameters<Func>>, ExpectedOrTester<ReturnType<Func>>])[]) => {
       for (const [i, [input, expectedOrTester]] of cases.entries()) {
         try {
           runTestAndCompare(input, expectedOrTester, () => Reflect.apply(solution, void 0, input), "case", i);
