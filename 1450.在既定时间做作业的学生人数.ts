@@ -12,7 +12,5 @@ function busyStudent(startTime: number[], endTime: number[], queryTime: number):
   }, 0);
 }
 // @lc code=end
-test.Func(busyStudent).withCases(
-  [[[1,2,3], [3,2,7], 4], 1]
-)
-export {}
+test.Func(busyStudent).withCases([[[1, 2, 3], [3, 2, 7], 4], 1]);
+export {};

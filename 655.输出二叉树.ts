@@ -60,4 +60,4 @@ test.Func(printTree).withCases(
     ],
   ]
 );
-export {}
+export {};
