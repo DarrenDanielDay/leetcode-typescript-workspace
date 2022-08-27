@@ -68,3 +68,5 @@ test
   // Use `test.nested.create` to create NestedIterator[].
   .withInputs([[test.nested.create([1, [4, [6]]])], [], [], [], [], [], [], []])
   .expectResults([null, true, 1, true, 4, true, 6, false]);
+
+export {};
