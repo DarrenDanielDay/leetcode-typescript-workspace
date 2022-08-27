@@ -109,4 +109,4 @@ test.Func(movesToChessboard).withCases(
     -1,
   ]
 );
-export {}
+export {};
