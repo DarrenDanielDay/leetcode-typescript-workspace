@@ -328,6 +328,58 @@ const testObject = (() => {
         }
       }
     },
+    /**
+     * Try to parse the examples to test cases and apply them to the solution.
+     * @param examples the example in leetcode problem description
+     */
+    tryParseCases: (...examples: string[]) => {
+      const funcCode = solution.toString();
+      const funcMatch = /(function\s+)?(\w*)\((.*?)\)\s*[{=]/.exec(funcCode);
+      if (!funcMatch) {
+        throw new Error(`Failed to parse function code of "${solution.name}"`);
+      }
+      const [, , , parameters] = funcMatch;
+      if (parameters == null) {
+        throw new Error(`Failed to parse parameters of function "${solution.name}"`);
+      }
+      const names = parameters.split(",").map((part) => part.trim());
+      for (const [i, example] of examples.entries()) {
+        try {
+          const [inputText, outputText] = example.trim().split(/\r?\n/g);
+          if (inputText == null || outputText == null) {
+            throw new Error(`Failed to parse example ${i}, no input line or output line detected.`);
+          }
+          const parameterMatches = names.map((name) => {
+            const declaration = `${name} =`;
+            const index = inputText.indexOf(declaration);
+            if (!~index) {
+              throw new Error(`Failed to find parameter "${name}" in example ${i}.`);
+            }
+            return {
+              declaration,
+              index,
+            };
+          });
+          const expectedText = outputText.replace(/^.*?[:： ]/, "").trim();
+          if (!expectedText) {
+            throw new Error(`Failed to find result text in example ${i}`);
+          }
+          const input = parameterMatches.map(({ declaration, index }, j, arr) => {
+            const nextIndex = arr[j + 1]?.index;
+            return eval(
+              inputText
+                .slice(index + declaration.length, nextIndex)
+                .trim()
+                .replace(/,?$/, "")
+            );
+          });
+          const expected = eval(expectedText);
+          runTestAndCompare(input, expected, () => Reflect.apply(solution, void 0, input), "case", i);
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    },
   });
 
   const Class = <Constructor extends AnyConstructor>(ctor: Constructor) => {
