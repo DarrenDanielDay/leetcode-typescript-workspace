@@ -366,12 +366,54 @@ const testObject = (() => {
           }
           const input = parameterMatches.map(({ declaration, index }, j, arr) => {
             const nextIndex = arr[j + 1]?.index;
-            return eval(
+            const result = eval(
               inputText
                 .slice(index + declaration.length, nextIndex)
                 .trim()
                 .replace(/,?$/, "")
             );
+            if (Array.isArray(result)) {
+              const possibleTree = (() => {
+                if (result.some((item) => typeof item !== "number" && item != null)) {
+                  return null;
+                }
+                try {
+                  return tree.create(result);
+                } catch {
+                  return null;
+                }
+              })();
+              const possibleList = (() => {
+                if (result.some((item) => typeof item !== "number")) {
+                  return null;
+                }
+                try {
+                  return tree.create(result);
+                } catch {
+                  return null;
+                }
+              })();
+              const possibleTargets = [possibleTree, possibleList, result];
+              return new Proxy(result, {
+                get(target, prop) {
+                  for (const possibleTarget of possibleTargets) {
+                    if (possibleTarget && Reflect.has(possibleTarget, prop)) {
+                      return Reflect.get(possibleTarget, prop);
+                    }
+                  }
+                  return Reflect.get(target, prop);
+                },
+                set(target, prop, val) {
+                  for (const possibleTarget of possibleTargets) {
+                    if (possibleTarget && Reflect.has(possibleTarget, prop)) {
+                      return Reflect.set(possibleTarget, prop, val);
+                    }
+                  }
+                  return Reflect.set(target, prop, val);
+                },
+              });
+            }
+            return result;
           });
           const expected = eval(expectedText);
           runTestAndCompare(input, expected, () => Reflect.apply(solution, void 0, input), "case", i);
