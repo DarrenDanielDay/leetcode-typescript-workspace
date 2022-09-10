@@ -373,6 +373,7 @@ const testObject = (() => {
                 .replace(/,?$/, "")
             );
             if (Array.isArray(result)) {
+              let matchedTarget: TreeNode | ListNode | any[] | null = null;
               const possibleTree = (() => {
                 if (result.some((item) => typeof item !== "number" && item != null)) {
                   return null;
@@ -396,14 +397,21 @@ const testObject = (() => {
               const possibleTargets = [possibleTree, possibleList, result];
               return new Proxy(result, {
                 get(target, prop) {
+                  if (matchedTarget) {
+                    return Reflect.get(matchedTarget, prop);
+                  }
                   for (const possibleTarget of possibleTargets) {
                     if (possibleTarget && Reflect.has(possibleTarget, prop)) {
+                      matchedTarget = possibleTarget;
                       return Reflect.get(possibleTarget, prop);
                     }
                   }
                   return Reflect.get(target, prop);
                 },
                 set(target, prop, val) {
+                  if (matchedTarget) {
+                    return Reflect.set(matchedTarget, prop, val);
+                  }
                   for (const possibleTarget of possibleTargets) {
                     if (possibleTarget && Reflect.has(possibleTarget, prop)) {
                       return Reflect.set(possibleTarget, prop, val);
@@ -411,12 +419,35 @@ const testObject = (() => {
                   }
                   return Reflect.set(target, prop, val);
                 },
+                getPrototypeOf() {
+                  if (matchedTarget) {
+                    return Object.getPrototypeOf(matchedTarget);
+                  }
+                  return Object.getPrototypeOf(result);
+                },
               });
             }
             return result;
           });
           const expected = eval(expectedText);
-          runTestAndCompare(input, expected, () => Reflect.apply(solution, void 0, input), "case", i);
+          const tester = (output: unknown): boolean => {
+            if (
+              output instanceof ListNode &&
+              Array.isArray(expected) &&
+              expected.every((x: unknown): x is number => typeof x === "number")
+            ) {
+              return list.compare(expected)(output);
+            }
+            if (
+              output instanceof TreeNode &&
+              Array.isArray(expected) &&
+              expected.every((x: unknown): x is number | null => typeof x === "number" || x === null)
+            ) {
+              return tree.compare(expected)(output);
+            }
+            return _.eq(output, expected);
+          };
+          runTestAndCompare(input, tester, () => Reflect.apply(solution, void 0, input), "case", i);
         } catch (error) {
           console.error(error);
         }
