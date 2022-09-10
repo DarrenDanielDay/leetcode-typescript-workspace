@@ -445,6 +445,9 @@ const testObject = (() => {
             ) {
               return tree.compare(expected)(output);
             }
+            if (typeof output === "number" && typeof expected === "number") {
+              return Math.abs(output - expected) <= 1e-5;
+            }
             return _.eq(output, expected);
           };
           runTestAndCompare(input, tester, () => Reflect.apply(solution, void 0, input), "case", i);
