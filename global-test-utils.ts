@@ -332,7 +332,7 @@ const testObject = (() => {
      * Try to parse the examples to test cases and apply them to the solution.
      * @param examples the example in leetcode problem description
      */
-    tryParseCases: (...examples: string[]) => {
+    tryParseCases(...examples: string[]) {
       const funcCode = solution.toString();
       const funcMatch = /(function\s+)?(\w*)\((.*?)\)\s*[{=]/.exec(funcCode);
       if (!funcMatch) {
@@ -455,6 +455,13 @@ const testObject = (() => {
           console.error(error);
         }
       }
+    },
+    tryParseMultiCases(text: string) {
+      const parts = text
+        .split(/.*?[0-9]+\s*[:：]/g)
+        .map((s) => s.trim())
+        .filter((s) => !!s);
+      return this.tryParseCases(...parts);
     },
   });
 
