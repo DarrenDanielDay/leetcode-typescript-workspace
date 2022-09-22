@@ -497,7 +497,7 @@ const testObject = (() => {
             try {
               runTestAndCompare(
                 input,
-                expected,
+                expected == null ? (actual: unknown) => actual == null : expected,
                 () => Reflect.apply(instance[method], instance, input),
                 `instance ${id}:`,
                 method
