@@ -21,6 +21,7 @@
         "NODE_ENV": "debug"
       },
       "sourceMaps": true,
+      "internalConsoleOptions": "openOnSessionStart",
       "resolveSourceMapLocations": ["${workspaceFolder}/**"]
     }
   ]
