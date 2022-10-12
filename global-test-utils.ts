@@ -389,7 +389,7 @@ const testObject = (() => {
                   return null;
                 }
                 try {
-                  return tree.create(result);
+                  return list.create(result);
                 } catch {
                   return null;
                 }
@@ -402,7 +402,13 @@ const testObject = (() => {
                   }
                   for (const possibleTarget of possibleTargets) {
                     if (possibleTarget && Reflect.has(possibleTarget, prop)) {
-                      matchedTarget = possibleTarget;
+                      matchedTarget =
+                        possibleTargets.reduce(
+                          (count, target) => count + (target ? +Reflect.has(target, prop) : 0),
+                          0
+                        ) === 1
+                          ? possibleTarget
+                          : matchedTarget;
                       return Reflect.get(possibleTarget, prop);
                     }
                   }
