@@ -10,13 +10,14 @@ function distinctSubseqII(s: string): number {
   const mod = (n: number) => (n + m) % m;
   const n = s.length;
   let sum = 0;
-  const dp: Record<string, number>[] = [];
+  const aCharCode = 'a'.charCodeAt(0)
+  const dp: number[] = Array.from({length: 26}, () => 0);
   for (let i = 0; i < n; i++) {
     const char = s[i]!;
-    const lastDp = dp[i - 1]!;
-    const lastCharSum = lastDp?.[char] ?? 0;
+    const charIndex = char.charCodeAt(0) - aCharCode;
+    const lastCharSum = dp[charIndex]!;
     const endsWithSi = mod(sum + 1 - lastCharSum);
-    dp[i] = Object.assign({ ...lastDp }, { [char]: mod(endsWithSi + lastCharSum) });
+    dp[charIndex] = mod(endsWithSi + lastCharSum);
     sum = mod(sum + endsWithSi);
   }
   return sum;
