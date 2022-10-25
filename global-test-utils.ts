@@ -328,6 +328,147 @@ const testObject = (() => {
         }
       }
     },
+    /**
+     * Try to parse the examples to test cases and apply them to the solution.
+     * @param examples the example in leetcode problem description
+     */
+    tryParseCases(...examples: string[]) {
+      const funcCode = solution.toString();
+      const funcMatch = /(function\s+)?(\w*)\((.*?)\)\s*[{=]/.exec(funcCode);
+      if (!funcMatch) {
+        throw new Error(`Failed to parse function code of "${solution.name}"`);
+      }
+      const [, , , parameters] = funcMatch;
+      if (parameters == null) {
+        throw new Error(`Failed to parse parameters of function "${solution.name}"`);
+      }
+      const names = parameters.split(",").map((part) => part.trim());
+      for (const [i, example] of examples.entries()) {
+        try {
+          const [inputText, outputText] = example.trim().split(/\r?\n/g);
+          if (inputText == null || outputText == null) {
+            throw new Error(`Failed to parse example ${i}, no input line or output line detected.`);
+          }
+          const parameterMatches = names.map((name) => {
+            const declaration = `${name} =`;
+            const index = inputText.indexOf(declaration);
+            if (!~index) {
+              throw new Error(`Failed to find parameter "${name}" in example ${i}.`);
+            }
+            return {
+              declaration,
+              index,
+            };
+          });
+          const expectedText = outputText.replace(/^.*?[:： ]/, "").trim();
+          if (!expectedText) {
+            throw new Error(`Failed to find result text in example ${i}`);
+          }
+          const input = parameterMatches.map(({ declaration, index }, j, arr) => {
+            const nextIndex = arr[j + 1]?.index;
+            const result = eval(
+              inputText
+                .slice(index + declaration.length, nextIndex)
+                .trim()
+                .replace(/,?$/, "")
+            );
+            if (Array.isArray(result)) {
+              let matchedTarget: TreeNode | ListNode | any[] | null = null;
+              const possibleTree = (() => {
+                if (result.some((item) => typeof item !== "number" && item != null)) {
+                  return null;
+                }
+                try {
+                  return tree.create(result);
+                } catch {
+                  return null;
+                }
+              })();
+              const possibleList = (() => {
+                if (result.some((item) => typeof item !== "number")) {
+                  return null;
+                }
+                try {
+                  return list.create(result);
+                } catch {
+                  return null;
+                }
+              })();
+              const possibleTargets = [possibleTree, possibleList, result];
+              return new Proxy(result, {
+                get(target, prop) {
+                  if (matchedTarget) {
+                    return Reflect.get(matchedTarget, prop);
+                  }
+                  for (const possibleTarget of possibleTargets) {
+                    if (possibleTarget && Reflect.has(possibleTarget, prop)) {
+                      matchedTarget =
+                        possibleTargets.reduce(
+                          (count, target) => count + (target ? +Reflect.has(target, prop) : 0),
+                          0
+                        ) === 1
+                          ? possibleTarget
+                          : matchedTarget;
+                      return Reflect.get(possibleTarget, prop);
+                    }
+                  }
+                  return Reflect.get(target, prop);
+                },
+                set(target, prop, val) {
+                  if (matchedTarget) {
+                    return Reflect.set(matchedTarget, prop, val);
+                  }
+                  for (const possibleTarget of possibleTargets) {
+                    if (possibleTarget && Reflect.has(possibleTarget, prop)) {
+                      return Reflect.set(possibleTarget, prop, val);
+                    }
+                  }
+                  return Reflect.set(target, prop, val);
+                },
+                getPrototypeOf() {
+                  if (matchedTarget) {
+                    return Object.getPrototypeOf(matchedTarget);
+                  }
+                  return Object.getPrototypeOf(result);
+                },
+              });
+            }
+            return result;
+          });
+          const expected = eval(expectedText);
+          const tester = (output: unknown): boolean => {
+            if (
+              output instanceof ListNode &&
+              Array.isArray(expected) &&
+              expected.every((x: unknown): x is number => typeof x === "number")
+            ) {
+              return list.compare(expected)(output);
+            }
+            if (
+              output instanceof TreeNode &&
+              Array.isArray(expected) &&
+              expected.every((x: unknown): x is number | null => typeof x === "number" || x === null)
+            ) {
+              return tree.compare(expected)(output);
+            }
+            if (typeof output === "number" && typeof expected === "number") {
+              return Math.abs(output - expected) <= 1e-5;
+            }
+            return _.isEqual(output, expected);
+          };
+          runTestAndCompare(input, tester, () => Reflect.apply(solution, void 0, input), "case", i);
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    },
+    tryParseMultiCases(text: string) {
+      const parts = text
+        .split(/.*?[0-9]+\s*[:：]/g)
+        .map((s) => s.trim())
+        .filter((s) => !!s);
+      return this.tryParseCases(...parts);
+    },
   });
 
   const Class = <Constructor extends AnyConstructor>(ctor: Constructor) => {
