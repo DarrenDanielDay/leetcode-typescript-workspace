@@ -54,6 +54,8 @@ gh repo clone DarrenDanielDay/leetcode-typescript-workspace
 
 然后用 `vscode` 打开这个仓库。 如果您看到扩展推荐，请安装它 👈。
 
+不要忘记将您的本地仓库设置为[`LeetCode.vscode-leetcode`](https://github.com/LeetCode-OpenSource/vscode-leetcode)的工作区文件夹。
+
 ### 2. 安装依赖
 
 您可以通过 `npm`、`yarn`、`pnpm` 或任何其他您喜欢的 `Node.JS` 包管理器安装依赖项。

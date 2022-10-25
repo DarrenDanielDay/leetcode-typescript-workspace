@@ -54,6 +54,10 @@ gh repo clone DarrenDanielDay/leetcode-typescript-workspace
 
 And then open this repository with `vscode`. If you see extension recommendation, please install it 👈.
 
+Don't forget to set your local repository as the workspace folder of [`LeetCode.vscode-leetcode`](https://github.com/LeetCode-OpenSource/vscode-leetcode).
+
+![settings.png](assets/screenshots/settings-en.png)
+
 ### 2. Install dependencies
 
 You can install dependencies via `npm`, `yarn`, `pnpm` or any other `Node.JS` package manager you like.
